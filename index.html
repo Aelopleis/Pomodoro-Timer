@@ -648,8 +648,8 @@
   modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) modalOverlay.classList.remove('open'); });
 
   modalConfirm.addEventListener('click', () => {
-    const w = parseInt(workInput.value) || 90;
-    const b = parseInt(breakInput.value) || 10;
+    const w = parseInt(workInput.value) || 80;
+    const b = parseInt(breakInput.value) || 20;
     workMin = Math.max(1, Math.min(240, w));
     breakMin = Math.max(1, Math.min(60, b));
     ratioBtn.textContent = `${workMin}/${breakMin}`;
