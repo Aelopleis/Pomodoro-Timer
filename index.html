@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Pomodoro</title>
-<link rel="apple-touch-icon" href="IMG_0107.jpeg">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -15,6 +14,7 @@
     --text-primary: #ffffff;
     --text-on-light: #0a0a0a;
     --text-on-dark: #e0e0e0;
+    --blend-opacity: 1;
   }
 
   body {
@@ -31,6 +31,7 @@
     user-select: none;
   }
 
+  /* TOP BAR */
   .top-bar {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -58,6 +59,7 @@
     height: 2px;
     background: var(--text-primary);
     border-radius: 2px;
+    transition: background 0.2s;
   }
 
   .ratio-btn {
@@ -75,6 +77,7 @@
   }
   .ratio-btn:hover { background: rgba(255,255,255,0.08); }
 
+  /* CIRCLES */
   .circles-wrapper {
     position: relative;
     width: 520px;
@@ -97,27 +100,54 @@
     transition: background 0.4s;
   }
 
-  .circle-left  { left: 20px;  background: var(--circle-left);  z-index: 2; }
-  .circle-right { right: 20px; background: var(--circle-right); z-index: 1; }
+  .circle-left {
+    left: 20px;
+    background: var(--circle-left);
+    z-index: 2;
+  }
+
+  .circle-right {
+    right: 20px;
+    background: var(--circle-right);
+    z-index: 1;
+  }
+
+  /* Intersection overlay */
+  .circle-intersection {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 130px;
+    height: 280px;
+    z-index: 3;
+    pointer-events: none;
+    overflow: hidden;
+  }
 
   .circle-number {
     font-size: 86px;
     font-weight: 200;
     line-height: 1;
     letter-spacing: -0.03em;
+    transition: color 0.3s;
   }
+
   .circle-label {
     font-size: 15px;
     font-weight: 300;
     letter-spacing: 0.12em;
     opacity: 0.75;
+    transition: color 0.3s;
   }
 
-  .circle-left  .circle-number,
-  .circle-left  .circle-label { color: var(--text-on-light); }
+  .circle-left .circle-number,
+  .circle-left .circle-label { color: var(--text-on-light); }
+
   .circle-right .circle-number,
   .circle-right .circle-label { color: var(--text-on-dark); }
 
+  /* STATUS */
   .status-row {
     margin-top: 48px;
     display: flex;
@@ -131,12 +161,12 @@
     background: var(--circle-left);
     animation: pulse 1.5s ease-in-out infinite;
   }
-  .status-dot.break  { background: var(--circle-right); animation: none; opacity: 0.5; }
+  .status-dot.break { background: var(--circle-right); animation: none; opacity: 0.5; }
   .status-dot.paused { animation: none; opacity: 0.4; }
 
   @keyframes pulse {
     0%, 100% { opacity: 1; transform: scale(1); }
-    50%       { opacity: 0.5; transform: scale(0.7); }
+    50% { opacity: 0.5; transform: scale(0.7); }
   }
 
   .status-text {
@@ -147,6 +177,7 @@
     opacity: 0.55;
   }
 
+  /* ACTION BUTTONS */
   .action-row {
     margin-top: 28px;
     display: flex;
@@ -173,7 +204,7 @@
   }
   .action-btn.primary:hover { background: rgba(255,255,255,0.2); }
 
-  /* PANEL */
+  /* PANEL OVERLAY */
   .panel-overlay {
     display: none;
     position: fixed;
@@ -198,7 +229,7 @@
   }
   @keyframes slideIn {
     from { transform: translateX(-100%); }
-    to   { transform: translateX(0); }
+    to { transform: translateX(0); }
   }
 
   .panel h2 {
@@ -227,7 +258,11 @@
     flex-shrink: 0;
   }
 
-  .color-input-wrap { display: flex; align-items: center; gap: 8px; }
+  .color-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
 
   .color-swatch {
     width: 24px; height: 24px;
@@ -252,7 +287,11 @@
   }
   .hex-input:focus { border-color: rgba(255,255,255,0.3); }
 
-  .toggle-row { display: flex; align-items: center; justify-content: space-between; }
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
 
   .toggle {
     width: 44px; height: 24px;
@@ -299,7 +338,7 @@
   }
   .close-panel-btn:hover { background: rgba(255,255,255,0.1); }
 
-  /* MODAL */
+  /* RATIO MODAL */
   .modal-overlay {
     display: none;
     position: fixed;
@@ -324,7 +363,7 @@
   }
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(12px); }
-    to   { opacity: 1; transform: translateY(0); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
   .modal h3 {
@@ -335,7 +374,12 @@
     opacity: 0.4;
   }
 
-  .modal-row { display: flex; align-items: center; justify-content: space-between; }
+  .modal-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
   .modal-label { font-size: 14px; font-weight: 300; opacity: 0.7; }
 
   .num-input {
@@ -375,6 +419,7 @@
 </head>
 <body>
 
+<!-- TOP BAR -->
 <div class="top-bar">
   <button class="menu-btn" id="menuBtn" aria-label="Ayarlar">
     <span></span><span></span><span></span>
@@ -382,6 +427,7 @@
   <button class="ratio-btn" id="ratioBtn">80/20</button>
 </div>
 
+<!-- CIRCLES -->
 <div class="circles-wrapper">
   <div class="circle circle-left" id="circleLeft">
     <div class="circle-number" id="minuteDisplay">80</div>
@@ -393,11 +439,13 @@
   </div>
 </div>
 
+<!-- STATUS -->
 <div class="status-row">
-  <div class="status-dot paused" id="statusDot"></div>
-  <div class="status-text" id="statusText">Hazır</div>
+  <div class="status-dot" id="statusDot"></div>
+  <div class="status-text" id="statusText">Çalışıyor</div>
 </div>
 
+<!-- BUTTONS -->
 <div class="action-row">
   <button class="action-btn" id="resetBtn">Sıfırla</button>
   <button class="action-btn primary" id="startBtn">Başlat</button>
@@ -407,8 +455,10 @@
 <div class="panel-overlay" id="panelOverlay">
   <div class="panel">
     <h2>Ayarlar</h2>
+
     <div class="panel-section">
       <div class="panel-label" style="opacity:0.5;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;">Renkler</div>
+
       <div class="panel-row">
         <span class="panel-label">Arka plan</span>
         <div class="color-input-wrap">
@@ -416,6 +466,7 @@
           <input class="hex-input" id="hexBg" value="#0a0a0a" maxlength="7" placeholder="#000000">
         </div>
       </div>
+
       <div class="panel-row">
         <span class="panel-label">Sol yuvarlak</span>
         <div class="color-input-wrap">
@@ -423,6 +474,7 @@
           <input class="hex-input" id="hexLeft" value="#b0b0b0" maxlength="7" placeholder="#b0b0b0">
         </div>
       </div>
+
       <div class="panel-row">
         <span class="panel-label">Sağ yuvarlak</span>
         <div class="color-input-wrap">
@@ -430,6 +482,7 @@
           <input class="hex-input" id="hexRight" value="#3a3a3a" maxlength="7" placeholder="#3a3a3a">
         </div>
       </div>
+
       <div class="panel-row">
         <span class="panel-label">Yazı rengi (sol)</span>
         <div class="color-input-wrap">
@@ -437,6 +490,7 @@
           <input class="hex-input" id="hexTextLight" value="#0a0a0a" maxlength="7" placeholder="#0a0a0a">
         </div>
       </div>
+
       <div class="panel-row">
         <span class="panel-label">Yazı rengi (sağ)</span>
         <div class="color-input-wrap">
@@ -445,7 +499,9 @@
         </div>
       </div>
     </div>
+
     <div class="divider"></div>
+
     <div class="panel-section">
       <div class="panel-label" style="opacity:0.5;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;">Görünüm</div>
       <div class="toggle-row panel-row">
@@ -453,6 +509,7 @@
         <button class="toggle" id="transparencyToggle"></button>
       </div>
     </div>
+
     <button class="close-panel-btn" id="closePanelBtn">Kapat</button>
   </div>
 </div>
@@ -477,175 +534,136 @@
 </div>
 
 <script>
-  // ─── STATE ───────────────────────────────────────────────────────────────────
+  // STATE
   let workMin = 80, breakMin = 20;
-  let currentPhase = 'work';       // 'work' | 'break'
-  let phaseDuration = workMin * 60; // total seconds for current phase
+  let currentPhase = 'work'; // 'work' | 'break'
+  let totalSeconds = workMin * 60;
+  let remaining = totalSeconds;
   let running = false;
   let ticker = null;
   let transparencyOn = false;
 
-  // Elapsed-time tracking (key to background accuracy)
-  let startTimestamp = null;   // Date.now() when timer last started
-  let elapsedAtPause = 0;      // seconds already elapsed before last pause
-
-  // ─── DOM ─────────────────────────────────────────────────────────────────────
+  // DOM
   const minuteDisplay = document.getElementById('minuteDisplay');
   const secondDisplay = document.getElementById('secondDisplay');
-  const statusDot     = document.getElementById('statusDot');
-  const statusText    = document.getElementById('statusText');
-  const startBtn      = document.getElementById('startBtn');
-  const resetBtn      = document.getElementById('resetBtn');
-  const ratioBtn      = document.getElementById('ratioBtn');
+  const statusDot = document.getElementById('statusDot');
+  const statusText = document.getElementById('statusText');
+  const startBtn = document.getElementById('startBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const ratioBtn = document.getElementById('ratioBtn');
 
-  const menuBtn            = document.getElementById('menuBtn');
-  const panelOverlay       = document.getElementById('panelOverlay');
-  const closePanelBtn      = document.getElementById('closePanelBtn');
-  const modalOverlay       = document.getElementById('modalOverlay');
-  const modalCancel        = document.getElementById('modalCancel');
-  const modalConfirm       = document.getElementById('modalConfirm');
-  const workInput          = document.getElementById('workInput');
-  const breakInput         = document.getElementById('breakInput');
+  // Panels
+  const menuBtn = document.getElementById('menuBtn');
+  const panelOverlay = document.getElementById('panelOverlay');
+  const closePanelBtn = document.getElementById('closePanelBtn');
+  const modalOverlay = document.getElementById('modalOverlay');
+  const modalCancel = document.getElementById('modalCancel');
+  const modalConfirm = document.getElementById('modalConfirm');
+  const workInput = document.getElementById('workInput');
+  const breakInput = document.getElementById('breakInput');
   const transparencyToggle = document.getElementById('transparencyToggle');
 
-  // ─── HELPERS ─────────────────────────────────────────────────────────────────
-
-  // How many seconds have elapsed in the current run (real-clock based)
-  function getElapsed() {
-    if (!running) return elapsedAtPause;
-    return elapsedAtPause + Math.floor((Date.now() - startTimestamp) / 1000);
-  }
-
-  function getRemaining() {
-    return Math.max(0, phaseDuration - getElapsed());
-  }
-
+  // --- TIMER LOGIC ---
   function updateDisplay() {
-    const rem  = getRemaining();
-    const mins = Math.floor(rem / 60);
-    const secs = rem % 60;
+    const mins = Math.floor(remaining / 60);
+    const secs = remaining % 60;
     minuteDisplay.textContent = String(mins).padStart(2, '0');
     secondDisplay.textContent = String(secs).padStart(2, '0');
   }
 
-  // ─── PHASE SWITCH ────────────────────────────────────────────────────────────
-  function switchPhase() {
-    running = false;
-    clearInterval(ticker);
-    startTimestamp = null;
-    elapsedAtPause = 0;
+  function tick() {
+    if (remaining <= 0) {
+      clearInterval(ticker);
+      running = false;
+      switchPhase();
+      return;
+    }
+    remaining--;
+    updateDisplay();
+  }
 
+  function switchPhase() {
     if (currentPhase === 'work') {
-      currentPhase  = 'break';
-      phaseDuration = breakMin * 60;
-      statusDot.className  = 'status-dot break';
+      currentPhase = 'break';
+      totalSeconds = breakMin * 60;
+      remaining = totalSeconds;
+      statusDot.className = 'status-dot break';
       statusText.textContent = 'Mola';
     } else {
-      currentPhase  = 'work';
-      phaseDuration = workMin * 60;
-      statusDot.className  = 'status-dot';
+      currentPhase = 'work';
+      totalSeconds = workMin * 60;
+      remaining = totalSeconds;
+      statusDot.className = 'status-dot';
       statusText.textContent = 'Çalışıyor';
     }
     updateDisplay();
     startBtn.textContent = 'Başlat';
-    // Otomatik başlat: yorum satırını kaldırın isterseniz
-    // startStop();
+    running = false;
   }
 
-  // ─── TICK ────────────────────────────────────────────────────────────────────
-  function tick() {
-    updateDisplay();
-    if (getRemaining() <= 0) {
-      clearInterval(ticker);
-      running = false;
-      // Küçük gecikme: son 00:00 ekranda görünsün
-      setTimeout(switchPhase, 600);
-    }
-  }
-
-  // ─── START / PAUSE ───────────────────────────────────────────────────────────
   function startStop() {
     if (running) {
-      // PAUSE: kaydet ne kadar geçti
-      elapsedAtPause = getElapsed();
       clearInterval(ticker);
       running = false;
-      startBtn.textContent   = 'Devam';
-      statusDot.className    = 'status-dot paused';
+      startBtn.textContent = 'Devam';
+      statusDot.className = 'status-dot paused';
       statusText.textContent = 'Duraklatıldı';
     } else {
-      // START / RESUME: gerçek saati kaydet
-      startTimestamp = Date.now();
+      ticker = setInterval(tick, 1000);
       running = true;
-      ticker = setInterval(tick, 500); // 500ms: daha hızlı güncelleme, daha az gecikme
       startBtn.textContent = 'Duraklat';
       if (currentPhase === 'work') {
-        statusDot.className    = 'status-dot';
+        statusDot.className = 'status-dot';
         statusText.textContent = 'Çalışıyor';
       } else {
-        statusDot.className    = 'status-dot break';
+        statusDot.className = 'status-dot break';
         statusText.textContent = 'Mola';
       }
     }
   }
 
-  // ─── RESET ───────────────────────────────────────────────────────────────────
   function reset() {
     clearInterval(ticker);
     running = false;
-    currentPhase   = 'work';
-    phaseDuration  = workMin * 60;
-    startTimestamp = null;
-    elapsedAtPause = 0;
+    currentPhase = 'work';
+    totalSeconds = workMin * 60;
+    remaining = totalSeconds;
     updateDisplay();
-    startBtn.textContent   = 'Başlat';
-    statusDot.className    = 'status-dot paused';
+    startBtn.textContent = 'Başlat';
+    statusDot.className = 'status-dot paused';
     statusText.textContent = 'Hazır';
   }
 
-  // ─── VİSİBİLİTY API: Sekme/ekran geri döndüğünde ekranı hemen güncelle ──────
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && running) {
-      // Sayfaya geri dönüldüğünde kalan süreyi anında yansıt
-      updateDisplay();
-      // Eğer süre bitmişse faz geçişini tetikle
-      if (getRemaining() <= 0) {
-        clearInterval(ticker);
-        running = false;
-        setTimeout(switchPhase, 600);
-      }
-    }
-  });
+  startBtn.addEventListener('click', startStop);
+  resetBtn.addEventListener('click', reset);
 
-  // ─── RATIO MODAL ─────────────────────────────────────────────────────────────
+  // --- RATIO MODAL ---
   ratioBtn.addEventListener('click', () => {
-    workInput.value  = workMin;
+    workInput.value = workMin;
     breakInput.value = breakMin;
     modalOverlay.classList.add('open');
   });
   modalCancel.addEventListener('click', () => modalOverlay.classList.remove('open'));
-  modalOverlay.addEventListener('click', e => {
-    if (e.target === modalOverlay) modalOverlay.classList.remove('open');
-  });
+  modalOverlay.addEventListener('click', e => { if (e.target === modalOverlay) modalOverlay.classList.remove('open'); });
+
   modalConfirm.addEventListener('click', () => {
-    const w = parseInt(workInput.value)  || 80;
+    const w = parseInt(workInput.value) || 80;
     const b = parseInt(breakInput.value) || 20;
-    workMin  = Math.max(1, Math.min(240, w));
-    breakMin = Math.max(1, Math.min(60,  b));
+    workMin = Math.max(1, Math.min(240, w));
+    breakMin = Math.max(1, Math.min(60, b));
     ratioBtn.textContent = `${workMin}/${breakMin}`;
     modalOverlay.classList.remove('open');
     reset();
   });
 
-  // ─── SETTINGS PANEL ──────────────────────────────────────────────────────────
-  menuBtn.addEventListener('click',       () => panelOverlay.classList.add('open'));
+  // --- SETTINGS PANEL ---
+  menuBtn.addEventListener('click', () => panelOverlay.classList.add('open'));
   closePanelBtn.addEventListener('click', () => panelOverlay.classList.remove('open'));
-  panelOverlay.addEventListener('click',  e => {
-    if (e.target === panelOverlay) panelOverlay.classList.remove('open');
-  });
+  panelOverlay.addEventListener('click', e => { if (e.target === panelOverlay) panelOverlay.classList.remove('open'); });
 
+  // Color inputs
   function bindColor(hexId, swatchId, cssVar) {
-    const hexEl    = document.getElementById(hexId);
+    const hexEl = document.getElementById(hexId);
     const swatchEl = document.getElementById(swatchId);
     hexEl.addEventListener('input', () => {
       const val = hexEl.value.trim();
@@ -666,36 +684,39 @@
     swatchEl.addEventListener('click', () => hexEl.focus());
   }
 
-  bindColor('hexBg',        'swatchBg',        '--bg');
-  bindColor('hexLeft',      'swatchLeft',       '--circle-left');
-  bindColor('hexRight',     'swatchRight',      '--circle-right');
-  bindColor('hexTextLight', 'swatchTextLight',  '--text-on-light');
-  bindColor('hexTextDark',  'swatchTextDark',   '--text-on-dark');
+  bindColor('hexBg', 'swatchBg', '--bg');
+  bindColor('hexLeft', 'swatchLeft', '--circle-left');
+  bindColor('hexRight', 'swatchRight', '--circle-right');
+  bindColor('hexTextLight', 'swatchTextLight', '--text-on-light');
+  bindColor('hexTextDark', 'swatchTextDark', '--text-on-dark');
 
+  // Transparency toggle
   transparencyToggle.addEventListener('click', () => {
     transparencyOn = !transparencyOn;
     transparencyToggle.classList.toggle('on', transparencyOn);
-    const left  = document.getElementById('circleLeft');
-    const right = document.getElementById('circleRight');
-    if (transparencyOn) {
-      left.style.mixBlendMode  = 'screen';
-      right.style.mixBlendMode = 'screen';
-      left.style.opacity  = '0.88';
-      right.style.opacity = '0.88';
-    } else {
-      left.style.mixBlendMode  = '';
-      right.style.mixBlendMode = '';
-      left.style.opacity  = '1';
-      right.style.opacity = '1';
-    }
+    applyTransparency();
   });
 
-  // ─── BUTTON LISTENERS ────────────────────────────────────────────────────────
-  startBtn.addEventListener('click', startStop);
-  resetBtn.addEventListener('click', reset);
+  function applyTransparency() {
+    const left = document.getElementById('circleLeft');
+    const right = document.getElementById('circleRight');
+    if (transparencyOn) {
+      left.style.mixBlendMode = 'screen';
+      right.style.mixBlendMode = 'screen';
+      left.style.opacity = '0.88';
+      right.style.opacity = '0.88';
+    } else {
+      left.style.mixBlendMode = '';
+      right.style.mixBlendMode = '';
+      left.style.opacity = '1';
+      right.style.opacity = '1';
+    }
+  }
 
-  // ─── INIT ────────────────────────────────────────────────────────────────────
+  // --- INIT ---
   updateDisplay();
+  statusText.textContent = 'Hazır';
+  statusDot.className = 'status-dot paused';
 </script>
 </body>
 </html>
